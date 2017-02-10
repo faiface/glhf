@@ -12,5 +12,5 @@ open**GL** **H**ave **F**un - A Go package that makes life with OpenGL enjoyable
 ## Motivation
 
 OpenGL is verbose, it's usage patterns are repetitive and it's manual memory management doesn't fit
-Go's design. When developing a game development library, it's usually desirable to create some
+Go's design. When making a game development library, it's usually desirable to create some
 higher-level abstractions around OpenGL. This library is a take on that.
