@@ -19,6 +19,12 @@ OpenGL is verbose, it's usage patterns are repetitive and it's manual memory man
 Go's design. When making a game development library, it's usually desirable to create some
 higher-level abstractions around OpenGL. This library is a take on that.
 
+## Contribute!
+
+The library is young and many features are still missing. If you find a bug, have a proposal or a
+feature request, _do an issue_!. If you know how to implement something that's missing, _do a pull
+request_.
+
 ## Code
 
 The following are parts of the demo program, which can be found in the [examples](https://github.com/faiface/glhf/tree/master/examples/demo).
@@ -152,3 +158,20 @@ for !shouldQuit {
         })
 }
 ```
+
+## FAQ
+
+### Why do I have to use `github.com/faiface/mainthread` package with GLHF?
+
+First of all, OpenGL has to be done from one thread and many operating systems require, that the one
+thread will be the main thread of your application.
+
+But why that specific package? GLHF uses the `mainthread` package to do the garbage collection of
+OpenGL objects, which is super convenient. So in order for it to work correctly, you have to
+initialize the `mainthread` package through `mainthread.Run`. However, once you call this function
+there is no way to run functions on the main thread, except for through the `mainthread` package.
+
+### Why is the important XY feature not included?
+
+I probably didn't need it yet. If you want that features, create an issue or implement it and do a
+pull request.
