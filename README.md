@@ -185,3 +185,7 @@ pull request.
 
 No. You have to use another library for windowing, e.g.
 [github.com/go-gl/glfw/v3.2/glfw](https://github.com/go-gl/glfw/tree/master/v3.2/glfw).
+
+### Why not tests?
+
+If you find a way to automatically test OpenGL, I may add tests.
