@@ -161,6 +161,10 @@ for !shouldQuit {
 
 ## FAQ
 
+### Which version of OpenGL does GLHF use?
+
+It uses OpenGL 3.3 and uses [`github.com/go-gl/gl/v3.3-core/gl`](https://github.com/go-gl/gl/tree/master/v3.3-core/gl).
+
 ### Why do I have to use `github.com/faiface/mainthread` package with GLHF?
 
 First of all, OpenGL has to be done from one thread and many operating systems require, that the one
