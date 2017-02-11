@@ -163,7 +163,8 @@ for !shouldQuit {
 
 ### Which version of OpenGL does GLHF use?
 
-It uses OpenGL 3.3 and uses [`github.com/go-gl/gl/v3.3-core/gl`](https://github.com/go-gl/gl/tree/master/v3.3-core/gl).
+It uses OpenGL 3.3 and uses
+[`github.com/go-gl/gl/v3.3-core/gl`](https://github.com/go-gl/gl/tree/master/v3.3-core/gl).
 
 ### Why do I have to use `github.com/faiface/mainthread` package with GLHF?
 
@@ -179,3 +180,8 @@ there is no way to run functions on the main thread, except for through the `mai
 
 I probably didn't need it yet. If you want that features, create an issue or implement it and do a
 pull request.
+
+## Does GLHF create windows for me?
+
+No. You have to use another library for windowing, e.g.
+[github.com/go-gl/glfw/v3.2/glfw](https://github.com/go-gl/glfw/tree/master/v3.2/glfw).
