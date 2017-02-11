@@ -2,6 +2,10 @@
 
 open**GL** **H**ave **F**un - A Go package that makes life with OpenGL enjoyable.
 
+```
+go get github.com/faiface/glhf
+```
+
 ## Main features
 
 - Garbage collected OpenGL objects
