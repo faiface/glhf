@@ -57,7 +57,7 @@ func run() {
 	})
 
 	var (
-		// Here we define a vertex format of our VertexSlice. It's actually a basic slice
+		// Here we define a vertex format of our vertex slice. It's actually a basic slice
 		// literal.
 		//
 		// The vertex format consists of names and types of the attributes. The name is the
