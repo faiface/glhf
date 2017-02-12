@@ -23,7 +23,10 @@ func Clear(r, g, b, a float32) {
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 }
 
-// Viewport sets the drawing bounds in pixels. Drawing outside viewport is always discarted.
-func Viewport(x, y, w, h int32) {
+// Bounds sets the drawing bounds in pixels. Drawing outside bounds is always discarted.
+//
+// Calling this function is equivalent to setting viewport and scissor in OpenGL.
+func Bounds(x, y, w, h int32) {
 	gl.Viewport(x, y, w, h)
+	gl.Scissor(x, y, w, h)
 }
