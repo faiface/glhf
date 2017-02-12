@@ -59,7 +59,6 @@ func (f *Frame) Height() int {
 // Begin binds the Frame. All draw operations will target this Frame until End is called.
 func (f *Frame) Begin() {
 	f.fb.bind()
-	gl.Viewport(0, 0, int32(f.width), int32(f.height))
 }
 
 // End unbinds the Frame. All draw operations will go to whatever was bound before this Frame.
