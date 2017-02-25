@@ -12,6 +12,7 @@ import (
 type Texture struct {
 	tex           binder
 	width, height int
+	smooth        bool
 }
 
 // NewTexture creates a new texture with the specified width and height with some initial
@@ -51,13 +52,7 @@ func NewTexture(width, height int, smooth bool, pixels []uint8) *Texture {
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_BORDER)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_BORDER)
 
-	if smooth {
-		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-	} else {
-		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-	}
+	tex.SetSmooth(smooth)
 
 	runtime.SetFinalizer(tex, (*Texture).delete)
 
@@ -115,6 +110,25 @@ func (t *Texture) Pixels(x, y, w, h int) []uint8 {
 		copy(subRow, row)
 	}
 	return subPixels
+}
+
+// SetSmooth sets whether the Texture should be drawn "smoothly" or "pixely".
+//
+// It affects how the Texture is drawn when zoomed. Smooth interpolates between the neighbour
+// pixels, while pixely always chooses the nearest pixel.
+func (t *Texture) SetSmooth(smooth bool) {
+	if smooth {
+		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+	} else {
+		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+	}
+}
+
+// Smooth returns whether the Texture is set to be drawn "smooth" or "pixely".
+func (t *Texture) Smooth() bool {
+	return t.smooth
 }
 
 // Begin binds the Texture. This is necessary before using the Texture.
