@@ -117,6 +117,7 @@ func (t *Texture) Pixels(x, y, w, h int) []uint8 {
 // It affects how the Texture is drawn when zoomed. Smooth interpolates between the neighbour
 // pixels, while pixely always chooses the nearest pixel.
 func (t *Texture) SetSmooth(smooth bool) {
+	t.smooth = smooth
 	if smooth {
 		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
 		gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
