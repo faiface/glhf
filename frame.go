@@ -9,9 +9,8 @@ import (
 
 // Frame is a fixed resolution texture that you can draw on.
 type Frame struct {
-	fb            binder
-	tex           *Texture
-	width, height int
+	fb, rf, df binder // framebuffer, read framebuffer, draw framebuffer
+	*Texture
 }
 
 // NewFrame creates a new fully transparent Frame with given dimensions in pixels.
@@ -23,16 +22,25 @@ func NewFrame(width, height int, smooth bool) *Frame {
 				gl.BindFramebuffer(gl.FRAMEBUFFER, obj)
 			},
 		},
-		width:  width,
-		height: height,
+		rf: binder{
+			restoreLoc: gl.READ_FRAMEBUFFER_BINDING,
+			bindFunc: func(obj uint32) {
+				gl.BindFramebuffer(gl.READ_FRAMEBUFFER, obj)
+			},
+		},
+		df: binder{
+			restoreLoc: gl.DRAW_FRAMEBUFFER_BINDING,
+			bindFunc: func(obj uint32) {
+				gl.BindFramebuffer(gl.DRAW_FRAMEBUFFER, obj)
+			},
+		},
+		Texture: NewTexture(width, height, smooth, make([]uint8, width*height*4)),
 	}
 
 	gl.GenFramebuffers(1, &f.fb.obj)
 
-	f.tex = NewTexture(width, height, smooth, make([]uint8, width*height*4))
-
 	f.fb.bind()
-	gl.FramebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, f.tex.tex.obj, 0)
+	gl.FramebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, f.Texture.tex.obj, 0)
 	f.fb.restore()
 
 	runtime.SetFinalizer(f, (*Frame).delete)
@@ -46,16 +54,6 @@ func (f *Frame) delete() {
 	})
 }
 
-// Width returns the width of the Frame in pixels.
-func (f *Frame) Width() int {
-	return f.width
-}
-
-// Height returns the height of the Frame in pixels.
-func (f *Frame) Height() int {
-	return f.height
-}
-
 // Begin binds the Frame. All draw operations will target this Frame until End is called.
 func (f *Frame) Begin() {
 	f.fb.bind()
@@ -66,9 +64,35 @@ func (f *Frame) End() {
 	f.fb.restore()
 }
 
-// Texture returns the Texture that this Frame draws to. The Texture changes as you use the Frame.
+// Blit copies rectangle (sx0, sy0, sx1, sy1) in this Frame onto rectangle (dx0, dy0, dx1, dy1) in
+// dst Frame.
 //
-// The Texture pointer returned from this method is always the same.
-func (f *Frame) Texture() *Texture {
-	return f.tex
+// If the dst Frame is nil, the destination will be the framebuffer 0, which is the screen.
+//
+// If the sizes of the rectangles don't match, the source will be stretched to fit the destination
+// rectangle. The stretch will be either smooth or pixely according to the source Frame's
+// smoothness.
+func (f *Frame) Blit(dst *Frame, sx0, sy0, sx1, sy1, dx0, dy0, dx1, dy1 int) {
+	f.rf.obj = f.fb.obj
+	if dst != nil {
+		f.df.obj = dst.fb.obj
+	} else {
+		f.df.obj = 0
+	}
+	f.rf.bind()
+	f.df.bind()
+
+	filter := gl.NEAREST
+	if f.Texture.smooth {
+		filter = gl.LINEAR
+	}
+
+	gl.BlitFramebuffer(
+		int32(sx0), int32(sy0), int32(sx1), int32(sy1),
+		int32(dx0), int32(dy0), int32(dx1), int32(dy1),
+		gl.COLOR_BUFFER_BIT, uint32(filter),
+	)
+
+	f.rf.restore()
+	f.df.restore()
 }
