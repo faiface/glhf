@@ -10,7 +10,7 @@ import (
 // Frame is a fixed resolution texture that you can draw on.
 type Frame struct {
 	fb, rf, df binder // framebuffer, read framebuffer, draw framebuffer
-	Texture    *Texture
+	tex        *Texture
 }
 
 // NewFrame creates a new fully transparent Frame with given dimensions in pixels.
@@ -34,13 +34,13 @@ func NewFrame(width, height int, smooth bool) *Frame {
 				gl.BindFramebuffer(gl.DRAW_FRAMEBUFFER, obj)
 			},
 		},
-		Texture: NewTexture(width, height, smooth, make([]uint8, width*height*4)),
+		tex: NewTexture(width, height, smooth, make([]uint8, width*height*4)),
 	}
 
 	gl.GenFramebuffers(1, &f.fb.obj)
 
 	f.fb.bind()
-	gl.FramebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, f.Texture.tex.obj, 0)
+	gl.FramebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, f.tex.tex.obj, 0)
 	f.fb.restore()
 
 	runtime.SetFinalizer(f, (*Frame).delete)
@@ -83,7 +83,7 @@ func (f *Frame) Blit(dst *Frame, sx0, sy0, sx1, sy1, dx0, dy0, dx1, dy1 int) {
 	f.df.bind()
 
 	filter := gl.NEAREST
-	if f.Texture.smooth {
+	if f.tex.smooth {
 		filter = gl.LINEAR
 	}
 
@@ -95,4 +95,9 @@ func (f *Frame) Blit(dst *Frame, sx0, sy0, sx1, sy1, dx0, dy0, dx1, dy1 int) {
 
 	f.rf.restore()
 	f.df.restore()
+}
+
+// Texture returns the Frame's underlying Texture that the Frame draws on.
+func (f *Frame) Texture() *Texture {
+	return f.tex
 }
