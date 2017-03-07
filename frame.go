@@ -10,7 +10,7 @@ import (
 // Frame is a fixed resolution texture that you can draw on.
 type Frame struct {
 	fb, rf, df binder // framebuffer, read framebuffer, draw framebuffer
-	*Texture
+	Texture    *Texture
 }
 
 // NewFrame creates a new fully transparent Frame with given dimensions in pixels.
