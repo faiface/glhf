@@ -15,7 +15,7 @@ func Init() {
 	}
 	gl.Enable(gl.BLEND)
 	gl.Enable(gl.SCISSOR_TEST)
-	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+	gl.BlendEquation(gl.FUNC_ADD)
 }
 
 // Clear clears the current framebuffer or window with the given color.
@@ -30,4 +30,22 @@ func Clear(r, g, b, a float32) {
 func Bounds(x, y, w, h int) {
 	gl.Viewport(int32(x), int32(y), int32(w), int32(h))
 	gl.Scissor(int32(x), int32(y), int32(w), int32(h))
+}
+
+// BlendFactor represents a source or destination blend factor.
+type BlendFactor int
+
+// Here's the list of all blend factors.
+const (
+	One              = BlendFactor(gl.ONE)
+	Zero             = BlendFactor(gl.ZERO)
+	SrcAlpha         = BlendFactor(gl.SRC_ALPHA)
+	DstAlpha         = BlendFactor(gl.DST_ALPHA)
+	OneMinusSrcAlpha = BlendFactor(gl.ONE_MINUS_SRC_ALPHA)
+	OneMinusDstAlpha = BlendFactor(gl.ONE_MINUS_DST_ALPHA)
+)
+
+// BlendFunc sets the source and destination blend factor.
+func BlendFunc(src, dst BlendFactor) {
+	gl.BlendFunc(uint32(src), uint32(dst))
 }
