@@ -65,6 +65,11 @@ func (t *Texture) delete() {
 	})
 }
 
+// ID returns the OpenGL ID of this Texture.
+func (t *Texture) ID() uint32 {
+	return t.tex.obj
+}
+
 // Width returns the width of the Texture in pixels.
 func (t *Texture) Width() int {
 	return t.width

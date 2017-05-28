@@ -54,6 +54,11 @@ func (f *Frame) delete() {
 	})
 }
 
+// ID returns the OpenGL framebuffer ID of this Frame.
+func (f *Frame) ID() uint32 {
+	return f.fb.obj
+}
+
 // Begin binds the Frame. All draw operations will target this Frame until End is called.
 func (f *Frame) Begin() {
 	f.fb.bind()
