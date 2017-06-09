@@ -163,8 +163,8 @@ for !shouldQuit {
 
 ### Which version of OpenGL does GLHF use?
 
-It uses OpenGL 3.3 and uses
-[`github.com/go-gl/gl/v3.3-core/gl`](https://github.com/go-gl/gl/tree/master/v3.3-core/gl).
+It uses OpenGL 2.1 and uses
+[`github.com/go-gl/gl/v2.1/gl`](https://github.com/go-gl/gl/tree/master/v2.1/gl). But don't worry, no legacy OpenGL here, OpenGL 2.1 is very forward-compatible, which makes it possible to use all of the performance of modern OpenGL, yet still be able to run on older hardware.
 
 ### Why do I have to use `github.com/faiface/mainthread` package with GLHF?
 

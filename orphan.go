@@ -1,6 +1,6 @@
 package glhf
 
-import "github.com/go-gl/gl/v3.3-core/gl"
+import "github.com/go-gl/gl/v2.1/gl"
 
 // Init initializes OpenGL by loading function pointers from the active OpenGL context.
 // This function must be manually run inside the main thread (using "github.com/faiface/mainthread"
