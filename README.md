@@ -164,7 +164,7 @@ for !shouldQuit {
 ### Which version of OpenGL does GLHF use?
 
 It uses OpenGL 3.3 and uses
-[`github.com/go-gl/gl/v2.1/gl`](https://github.com/go-gl/gl/tree/master/v2.1/gl).
+[`github.com/go-gl/gl/v3.3-core/gl`](https://github.com/go-gl/gl/tree/master/v3.3-core/gl).
 
 ### Why do I have to use `github.com/faiface/mainthread` package with GLHF?
 
