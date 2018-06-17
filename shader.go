@@ -162,54 +162,94 @@ func (s *Shader) SetUniformAttr(uniform int, value interface{}) (ok bool) {
 	if s.uniformLoc[uniform] < 0 {
 		return false
 	}
-
 	switch s.uniformFmt[uniform].Type {
 	case Int:
 		value := value.(int32)
 		gl.Uniform1iv(s.uniformLoc[uniform], 1, &value)
+	case Intp:
+		value := *value.(*int32)
+		gl.Uniform1iv(s.uniformLoc[uniform], 1, &value)
 	case Float:
 		value := value.(float32)
+		gl.Uniform1fv(s.uniformLoc[uniform], 1, &value)
+	case Floatp:
+		value := *value.(*float32)
 		gl.Uniform1fv(s.uniformLoc[uniform], 1, &value)
 	case Vec2:
 		value := value.(mgl32.Vec2)
 		gl.Uniform2fv(s.uniformLoc[uniform], 1, &value[0])
+	case Vec2p:
+		value := *value.(*mgl32.Vec2)
+		gl.Uniform2fv(s.uniformLoc[uniform], 1, &value[0])
 	case Vec3:
 		value := value.(mgl32.Vec3)
+		gl.Uniform3fv(s.uniformLoc[uniform], 1, &value[0])
+	case Vec3p:
+		value := *value.(*mgl32.Vec3)
 		gl.Uniform3fv(s.uniformLoc[uniform], 1, &value[0])
 	case Vec4:
 		value := value.(mgl32.Vec4)
 		gl.Uniform4fv(s.uniformLoc[uniform], 1, &value[0])
+	case Vec4p:
+		value := *value.(*mgl32.Vec4)
+		gl.Uniform4fv(s.uniformLoc[uniform], 1, &value[0])
 	case Mat2:
 		value := value.(mgl32.Mat2)
+		gl.UniformMatrix2fv(s.uniformLoc[uniform], 1, false, &value[0])
+	case Mat2p:
+		value := *value.(*mgl32.Mat2)
 		gl.UniformMatrix2fv(s.uniformLoc[uniform], 1, false, &value[0])
 	case Mat23:
 		value := value.(mgl32.Mat2x3)
 		gl.UniformMatrix2x3fv(s.uniformLoc[uniform], 1, false, &value[0])
+	case Mat23p:
+		value := *value.(*mgl32.Mat2x3)
+		gl.UniformMatrix2x3fv(s.uniformLoc[uniform], 1, false, &value[0])
 	case Mat24:
 		value := value.(mgl32.Mat2x4)
+		gl.UniformMatrix2x4fv(s.uniformLoc[uniform], 1, false, &value[0])
+	case Mat24p:
+		value := *value.(*mgl32.Mat2x4)
 		gl.UniformMatrix2x4fv(s.uniformLoc[uniform], 1, false, &value[0])
 	case Mat3:
 		value := value.(mgl32.Mat3)
 		gl.UniformMatrix3fv(s.uniformLoc[uniform], 1, false, &value[0])
+	case Mat3p:
+		value := *value.(*mgl32.Mat3)
+		gl.UniformMatrix3fv(s.uniformLoc[uniform], 1, false, &value[0])
 	case Mat32:
 		value := value.(mgl32.Mat3x2)
+		gl.UniformMatrix3x2fv(s.uniformLoc[uniform], 1, false, &value[0])
+	case Mat32p:
+		value := *value.(*mgl32.Mat3x2)
 		gl.UniformMatrix3x2fv(s.uniformLoc[uniform], 1, false, &value[0])
 	case Mat34:
 		value := value.(mgl32.Mat3x4)
 		gl.UniformMatrix3x4fv(s.uniformLoc[uniform], 1, false, &value[0])
+	case Mat34p:
+		value := *value.(*mgl32.Mat3x4)
+		gl.UniformMatrix3x4fv(s.uniformLoc[uniform], 1, false, &value[0])
 	case Mat4:
 		value := value.(mgl32.Mat4)
+		gl.UniformMatrix4fv(s.uniformLoc[uniform], 1, false, &value[0])
+	case Mat4p:
+		value := *value.(*mgl32.Mat4)
 		gl.UniformMatrix4fv(s.uniformLoc[uniform], 1, false, &value[0])
 	case Mat42:
 		value := value.(mgl32.Mat4x2)
 		gl.UniformMatrix4x2fv(s.uniformLoc[uniform], 1, false, &value[0])
+	case Mat42p:
+		value := *value.(*mgl32.Mat4x2)
+		gl.UniformMatrix4x2fv(s.uniformLoc[uniform], 1, false, &value[0])
 	case Mat43:
 		value := value.(mgl32.Mat4x3)
+		gl.UniformMatrix4x3fv(s.uniformLoc[uniform], 1, false, &value[0])
+	case Mat43p:
+		value := *value.(*mgl32.Mat4x3)
 		gl.UniformMatrix4x3fv(s.uniformLoc[uniform], 1, false, &value[0])
 	default:
 		panic("set uniform attr: invalid attribute type")
 	}
-
 	return true
 }
 
