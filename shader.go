@@ -20,8 +20,8 @@ type Shader struct {
 // NewShader creates a new shader program from the specified vertex shader and fragment shader
 // sources.
 //
-// Note that vertexShader and fragmentShader parameters must contain the source code, they're
-// not filenames.
+// Note that vertexShader and fragmentShader parameters must contain the
+// source code, they're not filenames.
 func NewShader(vertexFmt, uniformFmt AttrFormat, vertexShader, fragmentShader string) (*Shader, error) {
 	shader := &Shader{
 		program: binder{
