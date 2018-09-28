@@ -9,21 +9,21 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-// Shader is an OpenGL shader program.
-type Shader struct {
+// Compute is an OpenGL shader program.
+type Compute struct {
 	program    binder
 	vertexFmt  AttrFormat
 	uniformFmt AttrFormat
 	uniformLoc []int32
 }
 
-// NewShader creates a new shader program from the specified vertex shader and fragment shader
+// NewCompute creates a new shader program from the specified vertex shader and fragment shader
 // sources.
 //
-// Note that vertexShader and fragmentShader parameters must contain the
-// source code, they're not filenames.
-func NewShader(vertexFmt, uniformFmt AttrFormat, vertexShader, fragmentShader string) (*Shader, error) {
-	shader := &Shader{
+// Note that vertexShader and fragmentShader parameters must contain the source code, they're
+// not filenames.
+func NewCompute(vertexFmt, uniformFmt AttrFormat, vertexShader, fragmentShader string) (*Compute, error) {
+	shader := &Compute{
 		program: binder{
 			restoreLoc: gl.CURRENT_PROGRAM,
 			bindFunc: func(obj uint32) {
@@ -35,14 +35,14 @@ func NewShader(vertexFmt, uniformFmt AttrFormat, vertexShader, fragmentShader st
 		uniformLoc: make([]int32, len(uniformFmt)),
 	}
 
-	var vshader, fshader uint32
+	var vshader, fshader, cshader uint32
 
 	// vertex shader
 	{
 		vshader = gl.CreateShader(gl.VERTEX_SHADER)
-		src, free := gl.Strs(vertexShader)
+		src, free := gl.Strs(computeVertexShader)
 		defer free()
-		length := int32(len(vertexShader))
+		length := int32(len(computeVertexShader))
 		gl.ShaderSource(vshader, 1, src, &length)
 		gl.CompileShader(vshader)
 
@@ -63,9 +63,9 @@ func NewShader(vertexFmt, uniformFmt AttrFormat, vertexShader, fragmentShader st
 	// fragment shader
 	{
 		fshader = gl.CreateShader(gl.FRAGMENT_SHADER)
-		src, free := gl.Strs(fragmentShader)
+		src, free := gl.Strs(computeFragmentShader)
 		defer free()
-		length := int32(len(fragmentShader))
+		length := int32(len(computeFragmentShader))
 		gl.ShaderSource(fshader, 1, src, &length)
 		gl.CompileShader(fshader)
 
@@ -83,11 +83,35 @@ func NewShader(vertexFmt, uniformFmt AttrFormat, vertexShader, fragmentShader st
 		defer gl.DeleteShader(fshader)
 	}
 
+	// compute shader
+	{
+		cshader = gl.CreateShader(gl.COMPUTE_SHADER)
+		src, free := gl.Strs(computeShader)
+		defer free()
+		length := int32(len(computeShader))
+		gl.ShaderSource(cshader, 1, src, &length)
+		gl.CompileShader(cshader)
+
+		var success int32
+		gl.GetShaderiv(cshader, gl.COMPILE_STATUS, &success)
+		if success == gl.FALSE {
+			var logLen int32
+			gl.GetShaderiv(cshader, gl.INFO_LOG_LENGTH, &logLen)
+
+			infoLog := make([]byte, logLen)
+			gl.GetShaderInfoLog(cshader, logLen, nil, &infoLog[0])
+			return nil, fmt.Errorf("error compiling compute shader: %s", string(infoLog))
+		}
+
+		defer gl.DeleteShader(cshader)
+	}
+
 	// shader program
 	{
 		shader.program.obj = gl.CreateProgram()
 		gl.AttachShader(shader.program.obj, vshader)
 		gl.AttachShader(shader.program.obj, fshader)
+		gl.AttachShader(shader.program.obj, cshader)
 		gl.LinkProgram(shader.program.obj)
 
 		var success int32
@@ -108,31 +132,122 @@ func NewShader(vertexFmt, uniformFmt AttrFormat, vertexShader, fragmentShader st
 		shader.uniformLoc[i] = loc
 	}
 
-	runtime.SetFinalizer(shader, (*Shader).delete)
+	runtime.SetFinalizer(shader, (*Compute).delete)
 
 	return shader, nil
 }
 
-func (s *Shader) delete() {
+func (s *Compute) delete() {
 	mainthread.CallNonBlock(func() {
 		gl.DeleteProgram(s.program.obj)
 	})
 }
 
 // ID returns the OpenGL ID of this Shader.
-func (s *Shader) ID() uint32 {
+func (s *Compute) ID() uint32 {
 	return s.program.obj
 }
 
 // VertexFormat returns the vertex attribute format of this Shader. Do not change it.
-func (s *Shader) VertexFormat() AttrFormat {
+func (s *Compute) VertexFormat() AttrFormat {
 	return s.vertexFmt
 }
 
 // UniformFormat returns the uniform attribute format of this Shader. Do not change it.
-func (s *Shader) UniformFormat() AttrFormat {
+func (s *Compute) UniformFormat() AttrFormat {
 	return s.uniformFmt
 }
+
+var computeShader = `
+#version 330 core
+
+#extension GL_ARB_compute_shader : enable
+#extension GL_ARB_shader_storage_buffer_object : enable
+
+precision highp sampler2D;
+
+layout( std140, binding=1 ) buffer Pos {
+    vec2 pos[];
+};
+
+layout( std140, binding=2 ) buffer Vel {
+    vec2 vel[];
+};
+
+layout(local_size_x = WORK_GROUP_SIZE,  local_size_y = 1, local_size_z = 1) in;
+
+// compute shader to update particles
+void main() {
+    uint i = gl_GlobalInvocationID.x;
+	uint numParticles = 1024;
+	float damping = 0.95;
+    // thread block size may not be exact multiple of number of particles
+    if (i >= numParticles) return;
+
+    // read particle position and velocity from buffers
+    vec2 p = pos[i].xy;
+    vec2 v = vel[i].xy;
+
+    // integrate
+    p += v;
+    v *= damping;
+
+    // write new values
+    pos[i] = p;
+    vel[i] = v;
+}
+`
+
+var computeVertexShader = `
+#version 330 core
+
+in vec2 position;
+in vec4 color;
+in vec2 texCoords;
+in float intensity;
+
+out vec4 Color;
+out vec2 texcoords;
+out float Intensity;
+
+uniform mat3 u_transform;
+uniform vec4 u_bounds;
+
+void main() {
+	vec2 transPos = (u_transform * vec3(position, 1.0)).xy;
+	vec2 normPos = (transPos - u_bounds.xy) / u_bounds.zw * 2 - vec2(1, 1);
+	gl_Position = vec4(normPos, 0.0, 1.0);
+	Color = color;
+	texcoords = texCoords;
+	Intensity = intensity;
+}
+`
+
+var computeFragmentShader = `
+#version 330 core
+
+in vec4 Color;
+in vec2 texcoords;
+in float Intensity;
+
+out vec4 fragColor;
+
+uniform vec4 u_colormask;
+uniform vec4 u_texbounds;
+uniform sampler2D u_texture;
+
+void main() {
+	if (Intensity == 0) {
+		fragColor = u_colormask * Color;
+	} else {
+		fragColor = vec4(0, 0, 0, 0);
+		fragColor += (1 - Intensity) * Color;
+		vec2 t = (texcoords - u_texbounds.xy) / u_texbounds.zw;
+		fragColor += Intensity * Color * texture(u_texture, t);
+		fragColor *= u_colormask;
+	}
+}
+`
 
 // SetUniformAttr sets the value of a uniform attribute of this Shader. The attribute is
 // specified by the index in the Shader's uniform format.
@@ -158,7 +273,7 @@ func (s *Shader) UniformFormat() AttrFormat {
 // No other types are supported.
 //
 // The Shader must be bound before calling this method.
-func (s *Shader) SetUniformAttr(uniform int, value interface{}) (ok bool) {
+func (s *Compute) SetUniformAttr(uniform int, value interface{}) (ok bool) {
 	if s.uniformLoc[uniform] < 0 {
 		return false
 	}
@@ -254,11 +369,11 @@ func (s *Shader) SetUniformAttr(uniform int, value interface{}) (ok bool) {
 }
 
 // Begin binds the Shader program. This is necessary before using the Shader.
-func (s *Shader) Begin() {
+func (s *Compute) Begin() {
 	s.program.bind()
 }
 
 // End unbinds the Shader program and restores the previous one.
-func (s *Shader) End() {
+func (s *Compute) End() {
 	s.program.restore()
 }
