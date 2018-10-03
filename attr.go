@@ -41,20 +41,6 @@ const (
 	Mat4
 	Mat42
 	Mat43
-	Intp // pointers
-	Floatp
-	Vec2p
-	Vec3p
-	Vec4p
-	Mat2p
-	Mat23p
-	Mat24p
-	Mat3p
-	Mat32p
-	Mat34p
-	Mat4p
-	Mat42p
-	Mat43p
 )
 
 // Size returns the size of a type in bytes.
