@@ -20,8 +20,8 @@ type Shader struct {
 // NewShader creates a new shader program from the specified vertex shader and fragment shader
 // sources.
 //
-// Note that vertexShader and fragmentShader parameters must contain the source code, they're
-// not filenames.
+// Note that vertexShader and fragmentShader parameters must contain the
+// source code, they're not filenames.
 func NewShader(vertexFmt, uniformFmt AttrFormat, vertexShader, fragmentShader string) (*Shader, error) {
 	shader := &Shader{
 		program: binder{
@@ -162,7 +162,6 @@ func (s *Shader) SetUniformAttr(uniform int, value interface{}) (ok bool) {
 	if s.uniformLoc[uniform] < 0 {
 		return false
 	}
-
 	switch s.uniformFmt[uniform].Type {
 	case Int:
 		value := value.(int32)
@@ -209,7 +208,6 @@ func (s *Shader) SetUniformAttr(uniform int, value interface{}) (ok bool) {
 	default:
 		panic("set uniform attr: invalid attribute type")
 	}
-
 	return true
 }
 
