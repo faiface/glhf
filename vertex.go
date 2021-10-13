@@ -227,13 +227,13 @@ func newVertexArray(shader *Shader, cap int) *vertexArray {
 			size = 4
 		}
 
-		gl.VertexAttribPointer(
+		gl.VertexAttribPointerWithOffset(
 			uint32(loc),
 			size,
 			gl.FLOAT,
 			false,
 			int32(va.stride),
-			gl.PtrOffset(va.offset[i]),
+			uintptr(va.offset[i]),
 		)
 		gl.EnableVertexAttribArray(uint32(loc))
 	}
