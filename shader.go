@@ -141,20 +141,25 @@ func (s *Shader) UniformFormat() AttrFormat {
 //
 // Supplied value must correspond to the type of the attribute. Correct types are these
 // (right-hand is the type of the value):
-//   Attr{Type: Int}:   int32
-//   Attr{Type: Float}: float32
-//   Attr{Type: Vec2}:  mgl32.Vec2
-//   Attr{Type: Vec3}:  mgl32.Vec3
-//   Attr{Type: Vec4}:  mgl32.Vec4
-//   Attr{Type: Mat2}:  mgl32.Mat2
-//   Attr{Type: Mat23}: mgl32.Mat2x3
-//   Attr{Type: Mat24}: mgl32.Mat2x4
-//   Attr{Type: Mat3}:  mgl32.Mat3
-//   Attr{Type: Mat32}: mgl32.Mat3x2
-//   Attr{Type: Mat34}: mgl32.Mat3x4
-//   Attr{Type: Mat4}:  mgl32.Mat4
-//   Attr{Type: Mat42}: mgl32.Mat4x2
-//   Attr{Type: Mat43}: mgl32.Mat4x3
+//   Attr{Type: Int}:      int32
+//   Attr{Type: Float}:    float32
+//   Attr{Type: Vec2}:     mgl32.Vec2
+//   Attr{Type: Vec3}:     mgl32.Vec3
+//   Attr{Type: Vec4}:     mgl32.Vec4
+//   Attr{Type: Mat2}:     mgl32.Mat2
+//   Attr{Type: Mat23}:    mgl32.Mat2x3
+//   Attr{Type: Mat24}:    mgl32.Mat2x4
+//   Attr{Type: Mat3}:     mgl32.Mat3
+//   Attr{Type: Mat32}:    mgl32.Mat3x2
+//   Attr{Type: Mat34}:    mgl32.Mat3x4
+//   Attr{Type: Mat4}:     mgl32.Mat4
+//   Attr{Type: Mat42}:    mgl32.Mat4x2
+//   Attr{Type: Mat43}:    mgl32.Mat4x3
+//   Attr{Type: FloatArr}: []float32
+//   Attr{Type: Vec2Arr}:  []mgl32.Vec2
+//   Attr{Type: Vec4Arr}:  []mgl32.Vec4
+//   Attr{Type: Mat2Arr}:  []mgl32.Mat2
+
 // No other types are supported.
 //
 // The Shader must be bound before calling this method.
@@ -206,6 +211,22 @@ func (s *Shader) SetUniformAttr(uniform int, value interface{}) (ok bool) {
 	case Mat43:
 		value := value.(mgl32.Mat4x3)
 		gl.UniformMatrix4x3fv(s.uniformLoc[uniform], 1, false, &value[0])
+	case FloatArr:
+		value := value.([]float32)
+		length := int32(len(value))
+		gl.Uniform1fv(s.uniformLoc[uniform], length, &value[0])
+	case Vec2Arr:
+		value := value.([]mgl32.Vec2)
+		length := int32(len(value))
+		gl.Uniform2fv(s.uniformLoc[uniform], length, &value[0][0])
+	case Vec4Arr:
+		value := value.([]mgl32.Vec4)
+		length := int32(len(value))
+		gl.Uniform4fv(s.uniformLoc[uniform], length, &value[0][0])
+	case Mat2Arr:
+		value := value.([]mgl32.Mat2)
+		length := int32(len(value))
+		gl.UniformMatrix2fv(s.uniformLoc[uniform], length, false, &value[0][0])
 	default:
 		panic("set uniform attr: invalid attribute type")
 	}
