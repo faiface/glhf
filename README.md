@@ -1,3 +1,7 @@
+# \*\*\*\*\*NOTICE\*\*\*\*\* 
+
+This repo is not under active development anymore and has been archived. Continued development has been migrated to [gopxl/glhf](https://github.com/gopxl/glhf). A big thank you to [faiface](https://github.com/faiface) for creating this awesome library and for all the hard work put into it. We encourage old and new users to check out the new repo and contribute to it.
+
 # glhf [![GoDoc](https://godoc.org/github.com/faiface/glhf?status.svg)](http://godoc.org/github.com/faiface/glhf) [![Report card](https://goreportcard.com/badge/github.com/faiface/glhf)](https://goreportcard.com/report/github.com/faiface/glhf)
 
 open**GL** **H**ave **F**un - A Go package that makes life with OpenGL enjoyable.
