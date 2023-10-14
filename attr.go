@@ -41,6 +41,10 @@ const (
 	Mat4
 	Mat42
 	Mat43
+	FloatArr
+	Vec2Arr
+	Vec4Arr
+	Mat2Arr
 )
 
 // Size returns the size of a type in bytes.
@@ -74,6 +78,14 @@ func (at AttrType) Size() int {
 		return 4 * 2 * 4
 	case Mat43:
 		return 4 * 3 * 4
+	case FloatArr:
+		return 4 // used somewhere?
+	case Vec2Arr:
+		return 2 * 4 // used somewhere?
+	case Vec4Arr:
+		return 4 * 4 // used somewhere?
+	case Mat2Arr:
+		return 2 * 2 * 4 // used somewhere?
 	default:
 		panic("size of vertex attribute type: invalid type")
 	}
